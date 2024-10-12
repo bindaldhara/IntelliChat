@@ -17,7 +17,6 @@ import ChatBottombar from "./chat-bottombar";
 import { Message, UserMessage } from "@/types";
 import { Bot, UserRound } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useSelector } from "@/redux/store";
 
 interface ChatListProps {
   messages: Message[];
