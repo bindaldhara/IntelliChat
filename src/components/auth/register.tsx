@@ -4,11 +4,12 @@ import { Label } from "@/components/ui/label";
 import { registerSchema, type RegisterFormValues } from "./schema";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useDispatch } from "@/redux/store";
+import { useDispatch, useSelector } from "@/redux/store";
 import { register as registerUser } from "@/action/api";
 
 const Register = () => {
   const dispatch = useDispatch();
+  const { error: apiError } = useSelector((state) => state.user);
   const {
     register,
     handleSubmit,
@@ -60,8 +61,11 @@ const Register = () => {
           <p className="text-red-500">{errors.password?.message}</p>
         </div>
       </div>
+      {apiError && <p className="text-red-500">{apiError}</p>}
       <div className="flex justify-center mt-4">
-        <Button type="submit">Register</Button>
+        <Button type="submit" className="w-full">
+          Register
+        </Button>
       </div>
     </form>
   );

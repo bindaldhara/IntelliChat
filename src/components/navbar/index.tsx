@@ -5,6 +5,7 @@ import { Button } from "../ui/button";
 import { useNavigate, useParams } from "react-router-dom";
 import { saveChat } from "@/action/api";
 import { useMemo } from "react";
+import { clearMessages } from "@/redux/slice/chatbot";
 
 const Navbar = () => {
   const dispatch = useDispatch();
@@ -14,12 +15,16 @@ const Navbar = () => {
 
   const isSidebarOpen = useSelector((state) => state.app.isSidebarOpen);
   const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
-  const { chat_id, messages } = useSelector((state) => state.chatbot);
+  const { chat_id, messages, pending } = useSelector((state) => state.chatbot);
 
   const showSaveButton = useMemo(() => {
     const isCurrentChatSaved = id === chat_id;
     return messages.length > 0 && !isCurrentChatSaved;
   }, [messages.length, id, chat_id]);
+
+  const showNewChatButton = useMemo(() => {
+    return !isLoggedIn && messages.length !== 0;
+  }, [isLoggedIn, messages.length]);
 
   const handleSidebarOpen = () => {
     dispatch(toggleSidebar(true));
@@ -34,6 +39,11 @@ const Navbar = () => {
     navigate(`/${chat_id}`);
   };
 
+  const handleNewChat = () => {
+    dispatch(clearMessages());
+    navigate("/");
+  };
+
   return (
     <div className="flex justify-between items-center p-4">
       <div className="flex items-center gap-2">
@@ -46,12 +56,19 @@ const Navbar = () => {
         <h3 className="text-lg font-semibold">IntelliChat</h3>
       </div>
 
-      {!isLoggedIn && !showSaveButton && (
-        <Button onClick={() => dispatch(toggleAuthDialog(true))}>
-          Register
-        </Button>
-      )}
-      {showSaveButton && <Button onClick={handleSaveChat}>Save Chat</Button>}
+      <div className="space-x-4">
+        {showNewChatButton && (
+          <Button variant="outline" onClick={handleNewChat} disabled={pending}>
+            New Chat
+          </Button>
+        )}
+        {!isLoggedIn && !showSaveButton && (
+          <Button onClick={() => dispatch(toggleAuthDialog(true))}>
+            Register
+          </Button>
+        )}
+        {showSaveButton && <Button onClick={handleSaveChat}>Save Chat</Button>}
+      </div>
     </div>
   );
 };

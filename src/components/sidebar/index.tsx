@@ -2,16 +2,13 @@ import { getChatHistory } from "@/action/api/chat";
 import { cn } from "@/lib/utils";
 import { toggleAuthDialog, toggleSidebar } from "@/redux/slice/app";
 import { useDispatch, useSelector } from "@/redux/store";
-import {
-  EllipsisVertical,
-  PanelLeftClose,
-  SquarePen,
-} from "lucide-react";
+import { EllipsisVertical, PanelLeftClose, SquarePen } from "lucide-react";
 import { useEffect } from "react";
 import { NavLink, useNavigate, useParams } from "react-router-dom";
 import { Button } from "../ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { logout } from "@/redux/slice/user";
+import { clearMessages } from "@/redux/slice/chatbot";
 
 const Sidebar = () => {
   const dispatch = useDispatch();
@@ -26,6 +23,7 @@ const Sidebar = () => {
   };
 
   const handleNewChat = () => {
+    dispatch(clearMessages());
     navigate("/");
   };
 

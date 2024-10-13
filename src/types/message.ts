@@ -16,6 +16,7 @@ export interface AssistantMessage {
   result_visualization_path?: string;
   error?: string;
   loading?: boolean;
+  regenerate_possible?: boolean;
 }
 
 export type Message = UserMessage | AssistantMessage;

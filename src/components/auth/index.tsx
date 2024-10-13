@@ -12,6 +12,7 @@ import Register from "./register";
 import { fetchSelf } from "@/action/api";
 import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
+import { clearError } from "@/redux/slice/user";
 
 const AuthDialog = () => {
   const dispatch = useDispatch();
@@ -20,6 +21,11 @@ const AuthDialog = () => {
 
   const closeAuthDialog = () => {
     dispatch(toggleAuthDialog());
+  };
+
+  const handleChangeAuthType = () => {
+    dispatch(clearError());
+    setIsLogin(!isLogin);
   };
 
   useEffect(() => {
@@ -39,7 +45,7 @@ const AuthDialog = () => {
         </DialogHeader>
         {isLogin ? <Login /> : <Register />}
         <div className="text-center">
-          <Button variant="link" onClick={() => setIsLogin(!isLogin)}>
+          <Button variant="link" onClick={handleChangeAuthType}>
             {isLogin
               ? "Need an account? Register"
               : "Already have an account? Login"}

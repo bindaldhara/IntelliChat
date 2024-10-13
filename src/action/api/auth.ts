@@ -5,10 +5,10 @@ import { User } from "@/types";
 
 export const fetchSelf = createAsyncThunk(
   "auth_fetch_self",
-  async (defaultToken?: string): Promise<{ user: User }> => {
+  async (defaultToken?: string): Promise<{ user: User | null }> => {
     const token = defaultToken || localStorage.getItem(AUTH_TOKEN_KEY);
     if (!token) {
-      throw new Error("No token found");
+      throw new Error("no_token_found");
     }
 
     Axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;

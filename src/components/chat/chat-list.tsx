@@ -30,6 +30,7 @@ import {
 } from "../ui/collapsible";
 import { useDispatch } from "@/redux/store";
 import { regenerateMessage } from "@/action/api";
+import ErrorDialog from "./error-dialog";
 
 interface ChatListProps {
   messages: Message[];
@@ -117,7 +118,10 @@ export function ChatList({
                       index === messages.length - 1 &&
                         message.role === "user" &&
                         "mb-4",
-                      message.role === "assistant" && !!message.error && "mb-6"
+                      message.role === "assistant" &&
+                        !!message.error &&
+                        message.regenerate_possible &&
+                        "mb-6"
                     )}
                   />
                   <div className="w-full">
@@ -189,14 +193,16 @@ export function ChatList({
                       message.role === "user" && (
                         <ChatBubbleReadReciept readReciept={message.read} />
                       )}
-                    {message.role === "assistant" && !!message.error && (
-                      <p
-                        className="text-sm text-gray-500 mt-1 flex items-center gap-1 cursor-pointer"
-                        onClick={() => handleRegenerate(message.id)}
-                      >
-                        Regenerate response <RefreshCcw className="size-4" />
-                      </p>
-                    )}
+                    {message.role === "assistant" &&
+                      !!message.error &&
+                      message.regenerate_possible && (
+                        <p
+                          className="text-sm text-gray-500 mt-1 flex items-center gap-1 cursor-pointer"
+                          onClick={() => handleRegenerate(message.id)}
+                        >
+                          Regenerate response <RefreshCcw className="size-4" />
+                        </p>
+                      )}
                   </div>
                 </ChatBubble>
               </motion.div>
@@ -210,6 +216,7 @@ export function ChatList({
           showInCenter={messages.length === 0}
         />
       )}
+      <ErrorDialog />
     </div>
   );
 }

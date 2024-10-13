@@ -27,6 +27,9 @@ const userSlice = createSlice({
 
       localStorage.removeItem(AUTH_TOKEN_KEY);
     },
+    clearError: (state) => {
+      state.error = null;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -43,9 +46,11 @@ const userSlice = createSlice({
       })
       .addCase(login.pending, (state) => {
         state.isLoading = true;
+        state.error = null;
       })
       .addCase(register.pending, (state) => {
         state.isLoading = true;
+        state.error = null;
       })
       .addCase(register.rejected, (state, action) => {
         state.isLoading = false;
@@ -60,10 +65,20 @@ const userSlice = createSlice({
       .addCase(fetchSelf.fulfilled, (state, action) => {
         state.user = action.payload.user;
         state.isLoggedIn = true;
+      })
+      .addCase(fetchSelf.rejected, (state, action) => {
+        state.isLoggedIn = false;
+        if (action.error.message !== "no_token_found") {
+          state.error = action.error.message || "Something went wrong";
+        }
+      })
+      .addCase(fetchSelf.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
       });
   },
 });
 
-export const { logout } = userSlice.actions;
+export const { logout, clearError } = userSlice.actions;
 
 export default userSlice.reducer;

@@ -8,6 +8,7 @@ import {
   clearMessagesAfterId,
 } from "@/redux/slice/chatbot";
 import { Axios } from "./axios";
+import { AxiosError, AxiosResponse } from "axios";
 
 export const sendMessage = createAsyncThunk(
   "send_message",
@@ -31,13 +32,22 @@ export const sendMessage = createAsyncThunk(
       dispatch(addMessage({ chat_id, message: assistantMessage }));
     }, 3000);
 
-    return new Promise(async (resolve) => {
-      const res = await Axios.post("/message", {
-        chat_id,
-        message,
-      });
+    return new Promise(async (resolve, reject) => {
+      let res: AxiosResponse, err: AxiosError;
+      try {
+        res = await Axios.post("/message", {
+          chat_id,
+          message,
+        });
+      } catch (e) {
+        err = e as AxiosError;
+      }
       setTimeout(() => {
-        resolve(res.data);
+        if (err) {
+          reject(err);
+        } else {
+          resolve(res?.data);
+        }
       }, 4500);
     });
   }

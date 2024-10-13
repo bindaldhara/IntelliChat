@@ -2,6 +2,7 @@ import {
   getChatHistory,
   getChatMessages,
   regenerateMessage,
+  saveChat,
   sendMessage,
 } from "@/action/api/chat";
 import { AssistantMessage, ChatHistory, Message } from "@/types";
@@ -51,6 +52,8 @@ export const chatbotSlice = createSlice({
     clearMessages: (state) => {
       state.chat_id = "new";
       state.messages = [];
+      state.pending = false;
+      state.error = null;
     },
     setChatId: (state, action: PayloadAction<string>) => {
       state.chat_id = action.payload;
@@ -73,6 +76,9 @@ export const chatbotSlice = createSlice({
         state.messages = state.messages.slice(0, index + 1);
       }
     },
+    clearError: (state) => {
+      state.error = null;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -86,7 +92,18 @@ export const chatbotSlice = createSlice({
       })
       .addCase(sendMessage.rejected, (state, action) => {
         state.pending = false;
-        state.error = action.error.message ?? "something went wrong";
+
+        const index = state.messages.findIndex(
+          (message) => message.role === "assistant" && message.loading
+        );
+        if (index !== -1) {
+          state.messages[index] = {
+            ...state.messages[index],
+            loading: false,
+            error: action.error.message ?? "something went wrong",
+            regenerate_possible: false,
+          } as AssistantMessage;
+        }
       })
       // Todo add error cases for these
       .addCase(getChatMessages.fulfilled, (state, action) => {
@@ -112,6 +129,9 @@ export const chatbotSlice = createSlice({
       .addCase(regenerateMessage.rejected, (state, action) => {
         state.pending = false;
         state.error = action.error.message ?? "something went wrong";
+      })
+      .addCase(saveChat.rejected, (state, action) => {
+        state.error = action.error.message ?? "something went wrong";
       });
   },
 });
@@ -123,6 +143,7 @@ export const {
   setChatId,
   updateAssistantMessageData,
   clearMessagesAfterId,
+  clearError,
 } = chatbotSlice.actions;
 
 export default chatbotSlice.reducer;
