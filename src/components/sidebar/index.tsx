@@ -6,13 +6,10 @@ import {
   EllipsisVertical,
   PanelLeftClose,
   SquarePen,
-  User,
-  UserRound,
 } from "lucide-react";
 import { useEffect } from "react";
 import { NavLink, useNavigate, useParams } from "react-router-dom";
 import { Button } from "../ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { logout } from "@/redux/slice/user";
 
@@ -92,9 +89,6 @@ const Sidebar = () => {
         <div className="bg-muted p-4 border-t">
           {isLoggedIn && !!user ? (
             <div className="flex items-center gap-2 ">
-              <Avatar className="size-12 flex items-center justify-center">
-                <UserRound className="w-6 h-6" />
-              </Avatar>
               <div className="flex flex-col text-wrap">
                 <p className="text-base font-medium">{user?.name}</p>
                 <p className="text-xs text-muted-foreground">{user?.email}</p>
