@@ -1,12 +1,14 @@
 import {
   getChatHistory,
   getChatMessages,
+  regenerateMessage,
   sendMessage,
 } from "@/action/api/chat";
-import { ChatHistory, Message } from "@/types";
+import { AssistantMessage, ChatHistory, Message } from "@/types";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { logout } from "./user";
 
-export interface CounterState {
+export interface ChatbotState {
   messages: Message[];
   chat_id: string;
   pending: boolean;
@@ -14,7 +16,7 @@ export interface CounterState {
   chats: ChatHistory["chats"];
 }
 
-const initialState: CounterState = {
+const initialState: ChatbotState = {
   messages: [],
   chat_id: "",
   pending: false,
@@ -50,6 +52,27 @@ export const chatbotSlice = createSlice({
       state.chat_id = "new";
       state.messages = [];
     },
+    setChatId: (state, action: PayloadAction<string>) => {
+      state.chat_id = action.payload;
+    },
+    updateAssistantMessageData: (
+      state,
+      action: PayloadAction<{ id: string; data: Partial<AssistantMessage> }>
+    ) => {
+      const { id, data } = action.payload;
+      const index = state.messages.findIndex((message) => message.id === id);
+      if (index !== -1 && state.messages[index].role === "assistant") {
+        state.messages[index] = { ...state.messages[index], ...data };
+      }
+    },
+    clearMessagesAfterId: (state, action: PayloadAction<string>) => {
+      const index = state.messages.findIndex(
+        (message) => message.id === action.payload
+      );
+      if (index !== -1) {
+        state.messages = state.messages.slice(0, index + 1);
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -72,11 +95,34 @@ export const chatbotSlice = createSlice({
       })
       .addCase(getChatHistory.fulfilled, (state, action) => {
         state.chats = action.payload?.chats;
+      })
+      .addCase(logout, (state) => {
+        state.chats = [];
+        state.messages = [];
+        state.chat_id = "new";
+      })
+      .addCase(regenerateMessage.fulfilled, (state, action) => {
+        chatbotSlice.caseReducers.addMessage(state, action);
+        state.pending = false;
+      })
+      .addCase(regenerateMessage.pending, (state) => {
+        state.pending = true;
+        state.error = null;
+      })
+      .addCase(regenerateMessage.rejected, (state, action) => {
+        state.pending = false;
+        state.error = action.error.message ?? "something went wrong";
       });
   },
 });
 
-export const { addMessage, updateMessage, clearMessages } =
-  chatbotSlice.actions;
+export const {
+  addMessage,
+  updateMessage,
+  clearMessages,
+  setChatId,
+  updateAssistantMessageData,
+  clearMessagesAfterId,
+} = chatbotSlice.actions;
 
 export default chatbotSlice.reducer;

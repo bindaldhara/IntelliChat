@@ -49,7 +49,7 @@ export default function ChatBottombar({
   };
 
   const handleKeyPress = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (event.key === "Enter" && !event.shiftKey) {
+    if (event.key === "Enter" && !event.shiftKey && !pending) {
       event.preventDefault();
       handleSend();
     }
@@ -65,12 +65,12 @@ export default function ChatBottombar({
       className={cn(
         "p-2 pt-4 absolute bottom-0 z-10 w-full",
         showInCenter &&
-          "top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2/3 h-fit"
+          "top-1/2 left-1/2 -translate-x-1/2 -translate-y-3/4 md:w-2/3 h-fit"
       )}
     >
       {showInCenter && (
         <div className="text-center mb-5">
-          <p className="text-xl">Some text here</p>
+          <p className="text-2xl font-medium">What can I help with? 🤔</p>
         </div>
       )}
       <div className="flex justify-between w-full items-center gap-2 ">
@@ -96,7 +96,7 @@ export default function ChatBottombar({
               onKeyDown={handleKeyPress}
               onChange={handleInputChange}
               placeholder="Type a message..."
-              className="rounded-full focus-visible:outline-none focus-visible:ring-offset-0 focus-visible:ring-0 min-h-10 p-3"
+              className="rounded-full focus-visible:outline-none focus-visible:ring-offset-0 focus-visible:ring-0 min-h-10 p-3 px-5"
             />
           </motion.div>
 
@@ -117,7 +117,7 @@ export default function ChatBottombar({
             <Button
               className="h-9 w-9 shrink-0"
               onClick={handleSend}
-              disabled={!message.trim()}
+              disabled={!message.trim() || pending}
             >
               {pending ? (
                 <Loader className="min-w-4" />
