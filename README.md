@@ -51,7 +51,6 @@ To test admin features:
    - Password: admin12345
 3. Once logged in as admin, go to the `/admin` route to access admin features.
 
-Note: Keep these credentials secure and do not share them publicly in a real production environment.
 
 ## Technical Details
 
