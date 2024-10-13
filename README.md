@@ -16,3 +16,6 @@ Backend: https://github.com/bindaldhara/intelliChat-server
 2. **Run the application**:
    - npm run dev
 
+**Access the Admin Panel**:
+- Go to /admin to view the list of users and saved responses.
+
