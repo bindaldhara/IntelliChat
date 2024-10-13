@@ -20,13 +20,17 @@ To set up Intellichat locally, follow these steps:
    ```
    npm install
    ```
+3. Setup env file:
+   ```
+   VITE_API_BASE_URL="http://localhost:8000"
+   ```
 
-3. Start the development server:
+4. Start the development server:
    ```
    npm run dev
    ```
 
-4. Open your browser and navigate to `http://localhost:5173` to view the application.
+5. Open your browser and navigate to `http://localhost:5173` to view the application.
 
 ## Testing Guide
 
