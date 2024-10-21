@@ -1,9 +1,10 @@
 import { AUTH_TOKEN_KEY } from "@/constants";
 import axios from "axios";
-
+console.log("fyf",import.meta.env.VITE_API_BASE_URL);
 export const Axios = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
 });
+
 
 Axios.interceptors.request.use((config) => {
   const token = localStorage.getItem(AUTH_TOKEN_KEY);
