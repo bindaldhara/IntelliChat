@@ -28,7 +28,7 @@ jobs:
     - run: npm run build 
     - name: Copy build files to the web server location
       run: |
-        sudo cp -r ./build /var/www/react-app  # Make sure your self-hosted runner has access to this path
+        sudo cp -r ./dist /var/www/react-app  # Make sure your self-hosted runner has access to this path
 
     - name: Reload Nginx to apply changes
       run: sudo systemctl reload nginx
