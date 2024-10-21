@@ -62,7 +62,7 @@ const AdminPage = () => {
             className="md:hidden h-7"
             onClick={handleBack}
           >
-            <ChevronLeft className="h-4 w-4" />
+          <ChevronLeft className="h-4 w-4" />
           </Button>
         )}
         <h3 className="text-xl font-bold">Track User Activity</h3>

@@ -31,6 +31,7 @@ import {
 import { useDispatch } from "@/redux/store";
 import { regenerateMessage } from "@/action/api";
 import ErrorDialog from "./error-dialog";
+import ReactMarkdown from "react-markdown";
 
 interface ChatListProps {
   messages: Message[];
@@ -50,7 +51,7 @@ export function ChatList({
 }: ChatListProps) {
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const dispatch = useDispatch();
-  // Contains the ids of the messages that have their summary open
+
   const [openSummary, setOpenSummary] = useState<string[]>([]);
 
   const toggleSummary = (id: string) => {
@@ -149,7 +150,9 @@ export function ChatList({
                             <p className="text-red-500">{message.error}</p>
                           ) : (
                             <>
-                              <p>{message.result_text}</p>
+                              <ReactMarkdown>
+                                {message.result_text}
+                              </ReactMarkdown>
                               {message.summary && (
                                 <Collapsible
                                   open={isSummaryOpen}
@@ -195,7 +198,7 @@ export function ChatList({
                       )}
                     {message.role === "assistant" &&
                       !!message.error &&
-                      message.regenerate_possible && (
+                      (
                         <p
                           className="text-sm text-gray-500 mt-1 flex items-center gap-1 cursor-pointer"
                           onClick={() => handleRegenerate(message.id)}

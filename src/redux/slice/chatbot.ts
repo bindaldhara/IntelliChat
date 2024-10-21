@@ -105,7 +105,6 @@ export const chatbotSlice = createSlice({
           } as AssistantMessage;
         }
       })
-      // Todo add error cases for these
       .addCase(getChatMessages.fulfilled, (state, action) => {
         state.messages = action.payload?.messages;
         state.chat_id = action.payload?.chat_id;
