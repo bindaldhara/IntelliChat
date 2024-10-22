@@ -2,7 +2,7 @@ import { AUTH_TOKEN_KEY } from "@/constants";
 import axios from "axios";
 
 export const Axios = axios.create({
-  baseURL: "http://13.127.208.57",
+  baseURL: "http://65.2.69.3",
 });
 
 
