@@ -38,7 +38,7 @@ import ReactMarkdown from "react-markdown";
 interface ChatListProps {
   messages: Message[];
   sendMessage?: (newMessage: UserMessage) => void;
-  deleteMessage: (messageId: string) => void;
+  deleteMessage?: (messageId: string) => void;
   isLoading?: boolean;
   showBottombar?: boolean;
 }
