@@ -1,14 +1,19 @@
-import { getChatHistory } from "@/action/api/chat";
+import { getChatHistory, renameChat } from "@/action/api/chat";
 import { cn } from "@/lib/utils";
 import { toggleAuthDialog, toggleSidebar } from "@/redux/slice/app";
 import { useDispatch, useSelector } from "@/redux/store";
-import { EllipsisVertical, PanelLeftClose, SquarePen } from "lucide-react";
-import { useEffect } from "react";
+import {
+  EllipsisVertical,
+  PanelLeftClose,
+  SquarePen,
+} from "lucide-react"; 
+import { useEffect, useState } from "react";
 import { NavLink, useNavigate, useParams } from "react-router-dom";
 import { Button } from "../ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { logout } from "@/redux/slice/user";
 import { clearMessages } from "@/redux/slice/chatbot";
+import { deleteChat } from "@/action/api/chat"; 
 
 const Sidebar = () => {
   const dispatch = useDispatch();
@@ -17,6 +22,10 @@ const Sidebar = () => {
   const { isSidebarOpen } = useSelector((state) => state.app);
   const chats = useSelector((state) => state.chatbot.chats);
   const { isLoggedIn, user } = useSelector((state) => state.user);
+
+  const [isRenaming, setIsRenaming] = useState(false);
+  const [newTitle, setNewTitle] = useState("");
+  const [selectedChatId, setSelectedChatId] = useState("");
 
   const handleClose = () => {
     dispatch(toggleSidebar(false));
@@ -31,6 +40,29 @@ const Sidebar = () => {
     dispatch(toggleAuthDialog(true));
   };
 
+  const handleDeleteChat = (chat_id : string) => {
+    dispatch(deleteChat({chat_id})).then(() => {
+      dispatch(getChatHistory());
+      if (activeChatId === String(chat_id)) {
+        navigate("/"); 
+      }
+    });
+  };
+
+  const handleRenameChat = (chat_id: string) => {
+    setSelectedChatId(chat_id);
+    setNewTitle(chats.find((chat) => chat.id === chat_id)?.title || ""); 
+    setIsRenaming(true);
+  };
+
+  const handleSaveRename = () => {
+    if (selectedChatId && newTitle) {
+      dispatch(renameChat({chat_id : selectedChatId, newTitle})); 
+      setIsRenaming(false);
+      setNewTitle("");
+      setSelectedChatId("");
+    }
+  };
   useEffect(() => {
     if (isLoggedIn) {
       dispatch(getChatHistory());
@@ -80,9 +112,51 @@ const Sidebar = () => {
                 >
                   {chat.title}
                 </NavLink>
+                {/* <Button
+                  variant="ghost"
+                  className="ml-auto p-1"
+                  onClick={() => handleDeleteChat(chat.id)}
+                >
+                  <Trash2 className="h-4 w-4" /> 
+                </Button> */}
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <EllipsisVertical className="ml-auto cursor-pointer" />
+                  </PopoverTrigger>
+                  <PopoverContent className="w-32 p-0" align="start">
+                    <Button
+                      variant="ghost"
+                      className="h-10 focus-visible:ring-0 focus-visible:ring-offset-0 w-full justify-start"
+                      onClick={() => handleDeleteChat(chat.id)}
+                    >
+                      Delete
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      className="h-10 focus-visible:ring-0 focus-visible:ring-offset-0 w-full justify-start"
+                      onClick={() => handleRenameChat(chat.id)}
+                    >
+                      Rename
+                    </Button>
+                  </PopoverContent>
+                </Popover>
               </div>
             );
           })}
+          {isRenaming && (
+            <div className="p-4">
+              <input
+                type="text"
+                value={newTitle}
+                onChange={(e) => setNewTitle(e.target.value)}
+                className="border p-2 rounded w-full"
+                placeholder="New chat title"
+              />
+              <Button onClick={handleSaveRename} className="mt-2 w-full">
+                Save
+              </Button>
+            </div>
+          )}
         </div>
         <div className="bg-muted p-4 border-t">
           {isLoggedIn && !!user ? (

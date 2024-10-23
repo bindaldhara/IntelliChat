@@ -3,6 +3,7 @@ import { ChatList } from "./chat-list";
 import { UserMessage } from "@/types";
 import { useDispatch, useSelector } from "@/redux/store";
 import { getChatMessages, sendMessage } from "@/action/api/chat";
+import { removeMessage } from "@/redux/slice/chatbot";
 
 const Chat = ({ chat_id }: { chat_id: string }) => {
   const messages = useSelector((state) => state.chatbot.messages);
@@ -11,6 +12,10 @@ const Chat = ({ chat_id }: { chat_id: string }) => {
 
   const sendMessageFunction = (message: UserMessage) => {
     dispatch(sendMessage({ chat_id, message }));
+  };
+
+  const deleteMessageFunction = (messageId: string) => {
+    dispatch(removeMessage(messageId));
   };
 
   useEffect(() => {
@@ -27,6 +32,7 @@ const Chat = ({ chat_id }: { chat_id: string }) => {
         <ChatList
           messages={messages}
           sendMessage={sendMessageFunction}
+          deleteMessage={deleteMessageFunction} 
           isLoading={isLoading}
         />
       </div>

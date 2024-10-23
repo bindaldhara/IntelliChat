@@ -35,7 +35,17 @@ const Navbar = () => {
       dispatch(toggleAuthDialog(true));
       return;
     }
-    await dispatch(saveChat(chat_id));
+    const lastUserMessage = messages
+      .slice()
+      .reverse()
+      .find((message) => message.role === "user") ;
+
+      if (!lastUserMessage) {
+        console.error("No user message found to save the chat.");
+        return; 
+      }
+    await dispatch(saveChat({ chat_id, lastMessage: lastUserMessage?.message }));
+
     navigate(`/${chat_id}`);
   };
 

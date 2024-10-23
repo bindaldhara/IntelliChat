@@ -2,7 +2,7 @@ import { AUTH_TOKEN_KEY } from "@/constants";
 import axios from "axios";
 
 export const Axios = axios.create({
-  baseURL: "http://65.2.69.3",
+  baseURL: import.meta.env.VITE_API_BASE_URL,
 });
 
 

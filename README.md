@@ -55,5 +55,3 @@ To test admin features:
 ## Technical Details
 
 This project is built with React + TypeScript + Vite, providing a minimal setup with Hot Module Replacement (HMR) and some ESLint rules.
-
-

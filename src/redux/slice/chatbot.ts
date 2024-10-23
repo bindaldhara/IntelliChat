@@ -1,4 +1,6 @@
 import {
+  deleteChat,
+  deleteMessage,
   getChatHistory,
   getChatMessages,
   regenerateMessage,
@@ -25,6 +27,7 @@ const initialState: ChatbotState = {
   chats: [],
 };
 
+
 export const chatbotSlice = createSlice({
   name: "chatbot",
   initialState,
@@ -49,6 +52,25 @@ export const chatbotSlice = createSlice({
       );
       state.messages[index] = action.payload;
     },
+    removeMessage: (state, action: PayloadAction<string>) => {
+      state.messages = state.messages.filter(
+        (message) => message.id !== action.payload
+      );
+    },
+    renameChat: (
+      state,
+      action: PayloadAction<{ chatId: string; newTitle: string }>
+    ) => {
+      const { chatId, newTitle } = action.payload;
+      const chatIndex = state.chats.findIndex((chat) => chat.id === chatId);
+      if (chatIndex !== -1) {
+        state.chats[chatIndex].title = newTitle; 
+      }
+    },
+    removeChat: (state, action: PayloadAction<string>) => {
+      state.chats = state.chats.filter((chat) => chat.id !== action.payload);
+    },
+
     clearMessages: (state) => {
       state.chat_id = "new";
       state.messages = [];
@@ -131,13 +153,29 @@ export const chatbotSlice = createSlice({
       })
       .addCase(saveChat.rejected, (state, action) => {
         state.error = action.error.message ?? "something went wrong";
+      })
+      .addCase(deleteChat.rejected, (state, action) => {
+        state.error = action.error.message ?? "Unable to delete the chat";
+      })
+      .addCase(deleteMessage.fulfilled, (state, action) => {
+        state.messages = state.messages.filter(
+          (message) => message.id !== action.payload.id
+        );
+        state.error = ""; 
+      })
+      .addCase(deleteMessage.rejected, (state, action) => {
+        state.error = action.error.message ?? "Cannot delete the message";
       });
+
   },
 });
 
 export const {
   addMessage,
   updateMessage,
+  removeMessage,
+  removeChat,
+  renameChat,
   clearMessages,
   setChatId,
   updateAssistantMessageData,

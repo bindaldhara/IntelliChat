@@ -6,6 +6,8 @@ import {
   updateAssistantMessageData,
   updateMessage,
   clearMessagesAfterId,
+  removeMessage,
+  removeChat,
 } from "@/redux/slice/chatbot";
 import { Axios } from "./axios";
 import { AxiosError, AxiosResponse } from "axios";
@@ -89,9 +91,13 @@ export const getChatMessages = createAsyncThunk(
 
 export const saveChat = createAsyncThunk(
   "save_chat",
-  async (chat_id: string, { dispatch }) => {
+  async (
+    { chat_id, lastMessage }: { chat_id: string; lastMessage: string },
+    { dispatch }
+  ) => {
     const res = await Axios.post("/chat", {
       chat_id,
+      lastMessage, 
     });
 
     await dispatch(getChatHistory());
@@ -118,5 +124,43 @@ export const regenerateMessage = createAsyncThunk(
         resolve(res.data);
       }, 2000);
     });
+  }
+);
+
+export const deleteMessage = createAsyncThunk(
+  "delete_message",
+  async ({ message_id }: { message_id: string }, { dispatch }) => {
+    const res = await Axios.delete(`/message/${message_id}`);
+    dispatch(removeMessage(message_id));
+    if (res.data.deletedAssistantMessage) {
+      dispatch(removeMessage(res.data.deletedAssistantMessage.id));
+    }
+    if (res.data.chatDeleted) {
+      dispatch(removeChat(res.data.chat_id)); 
+    }
+    await dispatch(getChatHistory());
+
+    return res.data;
+  }
+);
+
+export const deleteChat = createAsyncThunk(
+  "delete_chat",
+  async({chat_id} : {chat_id : string}, {dispatch}) =>{
+    const res = await Axios.delete(`/chat/${chat_id}`);
+    dispatch(removeChat(chat_id));
+    return res.data;
+  }
+);
+
+export const renameChat = createAsyncThunk(
+  "rename_chat",
+  async (
+    { chat_id, newTitle }: { chat_id: string; newTitle: string },
+    { dispatch }
+  ) => {
+    const res = await Axios.put(`/chat/${chat_id}`, { title: newTitle });
+    dispatch(getChatHistory());
+    return res.data;
   }
 );

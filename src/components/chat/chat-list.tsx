@@ -29,13 +29,16 @@ import {
   CollapsibleTrigger,
 } from "../ui/collapsible";
 import { useDispatch } from "@/redux/store";
-import { regenerateMessage } from "@/action/api";
+import { regenerateMessage, 
+  // deleteMessage
+ } from "@/action/api";
 import ErrorDialog from "./error-dialog";
 import ReactMarkdown from "react-markdown";
 
 interface ChatListProps {
   messages: Message[];
   sendMessage?: (newMessage: UserMessage) => void;
+  deleteMessage: (messageId: string) => void;
   isLoading?: boolean;
   showBottombar?: boolean;
 }
@@ -66,6 +69,9 @@ export function ChatList({
     dispatch(regenerateMessage({ message_id: id }));
   };
 
+//  const handleDelete = (id: string) => {
+//    dispatch(deleteMessage({message_id : id})); 
+//  }
   useEffect(() => {
     if (messagesContainerRef.current) {
       messagesContainerRef.current.scrollTop =
@@ -196,16 +202,20 @@ export function ChatList({
                       message.role === "user" && (
                         <ChatBubbleReadReciept readReciept={message.read} />
                       )}
-                    {message.role === "assistant" &&
-                      !!message.error &&
-                      (
-                        <p
-                          className="text-sm text-gray-500 mt-1 flex items-center gap-1 cursor-pointer"
-                          onClick={() => handleRegenerate(message.id)}
-                        >
-                          Regenerate response <RefreshCcw className="size-4" />
-                        </p>
-                      )}
+                    {message.role === "assistant" && !!message.error && (
+                      <p
+                        className="text-sm text-gray-500 mt-1 flex items-center gap-1 cursor-pointer"
+                        onClick={() => handleRegenerate(message.id)}
+                      >
+                        Regenerate response <RefreshCcw className="size-4" />
+                      </p>
+                    )}
+                    {/* {message.role === "user" && (
+                      <Trash2
+                        className="absolute size-5 text-red-600 hover:text-red-800 top-0 right-0 cursor-pointer"
+                        onClick={() => handleDelete(message.id)}
+                      />
+                    )} */}
                   </div>
                 </ChatBubble>
               </motion.div>

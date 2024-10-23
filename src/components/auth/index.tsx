@@ -10,23 +10,44 @@ import { useDispatch, useSelector } from "@/redux/store";
 import Login from "./login";
 import Register from "./register";
 import { fetchSelf } from "@/action/api";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "../ui/button";
 import { clearError } from "@/redux/slice/user";
+import  ForgotPasswordModal  from "./forgotPassword";
 
 const AuthDialog = () => {
   const dispatch = useDispatch();
   const { isAuthDialogOpen } = useSelector((state) => state.app);
-  const [isLogin, setIsLogin] = useState(true);
+  const [page, setPage] = useState<Page>("login");
+
 
   const closeAuthDialog = () => {
     dispatch(toggleAuthDialog());
   };
 
-  const handleChangeAuthType = () => {
+  const handleChangeAuthType = (page:Page) => {
     dispatch(clearError());
-    setIsLogin(!isLogin);
+    setPage(page);
   };
+
+ const {title, description} = useMemo( ()=>{
+  let title = "";
+  let description = "";
+  if(page === "login"){
+    title = "Login";
+    description = "Login page";
+  }
+  else if(page === "register"){
+    title = "Register";
+    description = "Create a new account";
+  }
+  else{
+    title = "Forget Password";
+    description = "Enter your email to reset your password";
+
+  }
+  return {title,description};
+ }, [page]);
 
   useEffect(() => {
     dispatch(fetchSelf());
@@ -36,19 +57,21 @@ const AuthDialog = () => {
     <Dialog open={isAuthDialogOpen} onOpenChange={closeAuthDialog}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle className="">
-            {isLogin ? "Login" : "Register"}
-          </DialogTitle>
-          <DialogDescription className="">
-            {isLogin ? "Login to your account" : "Create a new account"}
-          </DialogDescription>
+          <DialogTitle className="">{title}</DialogTitle>
+          <DialogDescription className="">{description}</DialogDescription>
         </DialogHeader>
-        {isLogin ? <Login /> : <Register />}
+        {page === "login" && (
+          <Login onForgotPassword={() => handleChangeAuthType("forgetPass")} />
+        )}
+        {page === "register" && <Register />}
+        {page === "forgetPass" && (
+          <ForgotPasswordModal onClose={() => handleChangeAuthType("login")} />
+        )}
+
         <div className="text-center">
-          <Button variant="link" onClick={handleChangeAuthType}>
-            {isLogin
-              ? "Need an account? Register"
-              : "Already have an account? Login"}
+          <Button variant="link" onClick={() => handleChangeAuthType(page === "register" ? "login" : "register")}>
+            {page === "login" && "Need an account? Register"}
+            {page === "register" && "Already have an account? Login"}
           </Button>
         </div>
       </DialogContent>
@@ -57,3 +80,5 @@ const AuthDialog = () => {
 };
 
 export default AuthDialog;
+
+type Page = "login" | "register" | "forgetPass" ;

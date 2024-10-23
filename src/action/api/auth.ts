@@ -47,3 +47,25 @@ export const register = createAsyncThunk(
     return response.data;
   }
 );
+
+export const forgotPassword = createAsyncThunk(
+  "auth_forgotPassword",
+  async (payload: { email: string }) => {
+      const response = await Axios.post("/auth/forgot-password", payload);
+      const message = response.data.message;
+      return { message };
+  }
+);
+
+export const verifyOtpAndResetPassword = createAsyncThunk(
+  "auth_verifyOtpAndResetPassword",
+  async (
+    payload: { email: string; otp: string; newPassword: string },
+  ) => {
+      const response = await Axios.post(
+        "/auth/verify-otp-reset-password",
+        payload
+      );
+      return response.data; 
+    }
+);
