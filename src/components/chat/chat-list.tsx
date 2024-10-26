@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-
 import { ChatMessageList } from "@/components/ui/chat/chat-message-list";
 import { AnimatePresence, motion } from "framer-motion";
-
+import { toast } from "react-toastify"; // Import toast
+import { ToastContainer } from "react-toastify"; // Import ToastContainer
+import "react-toastify/dist/ReactToastify.css";
 import Loader from "@ui/loader";
-
 import {
   ChatBubble,
   ChatBubbleAvatar,
@@ -12,7 +12,6 @@ import {
   ChatBubbleReadReciept,
   ChatBubbleTimestamp,
 } from "../ui/chat/chat-bubble";
-
 import ChatBottombar from "./chat-bottombar";
 import { Message, UserMessage } from "@/types";
 import {
@@ -21,6 +20,9 @@ import {
   ChevronUp,
   RefreshCcw,
   UserRound,
+  ThumbsUp,
+  ThumbsDown,
+  Copy,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -28,19 +30,20 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "../ui/collapsible";
-import { useDispatch } from "@/redux/store";
-import { regenerateMessage, 
-  // deleteMessage
- } from "@/action/api";
+import {  useDispatch } from "@/redux/store";
+import { regenerateMessage } from "@/action/api";
 import ErrorDialog from "./error-dialog";
 import ReactMarkdown from "react-markdown";
+import { submitFeedback } from "@/action/api"; 
+import { useTheme } from "@/context/themeContext";
 
 interface ChatListProps {
   messages: Message[];
+  messageId?: string;
   sendMessage?: (newMessage: UserMessage) => void;
-  deleteMessage?: (messageId: string) => void;
   isLoading?: boolean;
   showBottombar?: boolean;
+  giveFeedback?: (messageId: string, feedback: "up" | "down") => void; 
 }
 
 const getMessageVariant = (messageRole: Message["role"]) =>
@@ -54,8 +57,10 @@ export function ChatList({
 }: ChatListProps) {
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const dispatch = useDispatch();
-
   const [openSummary, setOpenSummary] = useState<string[]>([]);
+  const [, setFeedbackGiven] = useState<{
+    [key: string]: string | null;
+  }>({});
 
   const toggleSummary = (id: string) => {
     setOpenSummary((prev) =>
@@ -69,9 +74,27 @@ export function ChatList({
     dispatch(regenerateMessage({ message_id: id }));
   };
 
-//  const handleDelete = (id: string) => {
-//    dispatch(deleteMessage({message_id : id})); 
-//  }
+  const handleFeedback = (messageId: string, feedback: "up" | "down") => {
+    setFeedbackGiven((prev) => ({
+      ...prev,
+      [messageId]: feedback,
+    }));
+    dispatch(submitFeedback({ messageId, feedback }));
+  };
+
+  const { theme } = useTheme();
+  const handleCopy = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast.success("Copied!", {
+      position: "top-right",
+      autoClose: 1000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      theme: theme === "dark" ? "dark" : "light",
+    });
+  };
+
   useEffect(() => {
     if (messagesContainerRef.current) {
       messagesContainerRef.current.scrollTop =
@@ -83,6 +106,8 @@ export function ChatList({
   const AssistantAvatar = Bot;
 
   return (
+    <>
+   <ToastContainer />
     <div className="w-full grow flex flex-col h-0 justify-between relative">
       {isLoading && (
         <div className="h-full w-full absolute top-0 left-0 z-30 backdrop-blur-sm flex justify-center items-center">
@@ -97,6 +122,7 @@ export function ChatList({
           {messages.map((message, index) => {
             const variant = getMessageVariant(message.role);
             const isSummaryOpen = openSummary.includes(message.id);
+
             return (
               <motion.div
                 key={index}
@@ -210,12 +236,34 @@ export function ChatList({
                         Regenerate response <RefreshCcw className="size-4" />
                       </p>
                     )}
-                    {/* {message.role === "user" && (
-                      <Trash2
-                        className="absolute size-5 text-red-600 hover:text-red-800 top-0 right-0 cursor-pointer"
-                        onClick={() => handleDelete(message.id)}
-                      />
-                    )} */}
+                    {message.role === "assistant" && (
+                      <div className="flex items-center space-x-2 mt-2">
+                        <button
+                          onClick={() => handleFeedback(message.id, "up")}
+                          className={cn("flex items-center p-1 rounded", {
+                            "text-green-500": message.feedback === "up",
+                            "hover:bg-green-100": message.feedback !== "up",
+                          })}
+                        >
+                          <ThumbsUp className="size-4" />
+                        </button>
+                        <button
+                          onClick={() => handleFeedback(message.id, "down")}
+                          className={cn("flex items-center p-1 rounded", {
+                            "text-red-500": message.feedback === "down",
+                            "hover:bg-red-100": message.feedback !== "down",
+                          })}
+                        >
+                          <ThumbsDown className="size-4" />
+                        </button>
+                        <button
+                          onClick={() => handleCopy(message.result_text || "")} // Ensure a string is passed
+                          className="flex items-center p-1 rounded text-gray-600 hover:text-blue-500"
+                        >
+                          <Copy className="size-4" />
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </ChatBubble>
               </motion.div>
@@ -231,5 +279,6 @@ export function ChatList({
       )}
       <ErrorDialog />
     </div>
+    </>
   );
 }

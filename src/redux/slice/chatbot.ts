@@ -6,6 +6,7 @@ import {
   regenerateMessage,
   saveChat,
   sendMessage,
+  submitFeedback,
 } from "@/action/api/chat";
 import { AssistantMessage, ChatHistory, Message } from "@/types";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
@@ -64,7 +65,7 @@ export const chatbotSlice = createSlice({
       const { chatId, newTitle } = action.payload;
       const chatIndex = state.chats.findIndex((chat) => chat.id === chatId);
       if (chatIndex !== -1) {
-        state.chats[chatIndex].title = newTitle; 
+        state.chats[chatIndex].title = newTitle;
       }
     },
     removeChat: (state, action: PayloadAction<string>) => {
@@ -161,13 +162,22 @@ export const chatbotSlice = createSlice({
         state.messages = state.messages.filter(
           (message) => message.id !== action.payload.id
         );
-        state.error = ""; 
+        state.error = "";
       })
       .addCase(deleteMessage.rejected, (state, action) => {
         state.error = action.error.message ?? "Cannot delete the message";
+      })
+      .addCase(submitFeedback.fulfilled, (state, action) => {
+        state.messages = state.messages.map((msg) => {
+          if (msg.role === "user" || msg.id !== action.payload.messageId)
+            return msg;
+          return {
+            ...msg,
+            feedback: action.payload.feedback,
+          };
+        });
       });
-
-  },
+          },
 });
 
 export const {

@@ -17,6 +17,7 @@ export interface AssistantMessage {
   error?: string;
   loading?: boolean;
   regenerate_possible?: boolean;
+  feedback?: "up" | "down";
 }
 
 export type Message = UserMessage | AssistantMessage;

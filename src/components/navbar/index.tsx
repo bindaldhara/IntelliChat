@@ -4,12 +4,14 @@ import { PanelRightClose } from "lucide-react";
 import { Button } from "../ui/button";
 import { useNavigate, useParams } from "react-router-dom";
 import { saveChat } from "@/action/api";
-import { useMemo } from "react";
+import { useMemo, useContext } from "react";
 import { clearMessages } from "@/redux/slice/chatbot";
+import { ThemeContext } from "@/context/themeContext";
 
 const Navbar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { toggleTheme, theme } = useContext(ThemeContext) ?? {};
 
   const { id } = useParams();
 
@@ -67,6 +69,17 @@ const Navbar = () => {
       </div>
 
       <div className="space-x-4">
+        <Button
+          variant="outline"
+          className={`${
+            theme === "dark"
+              ? "bg-black text-white border-white hover:bg-black hover:text-white"
+              : "bg-white text-black border-black hover:bg-white hover:text-black"
+          }`}
+          onClick={toggleTheme}
+        >
+          {theme === "light" ? "Dark Mode" : "Light Mode"}
+        </Button>
         {showNewChatButton && (
           <Button variant="outline" onClick={handleNewChat} disabled={pending}>
             New Chat

@@ -12,6 +12,7 @@ import {
 import { Axios } from "./axios";
 import { AxiosError, AxiosResponse } from "axios";
 
+
 export const sendMessage = createAsyncThunk(
   "send_message",
   async (
@@ -162,5 +163,15 @@ export const renameChat = createAsyncThunk(
     const res = await Axios.put(`/chat/${chat_id}`, { title: newTitle });
     dispatch(getChatHistory());
     return res.data;
+  }
+);
+
+export const submitFeedback = createAsyncThunk(
+  "submit_feedback",
+  async (
+    { messageId, feedback }: { messageId: string; feedback: "up" | "down" },
+  ) => {
+    const res = await Axios.post("/feedback", { messageId, feedback });
+    return  { messageId, feedback }; 
   }
 );

@@ -18,7 +18,8 @@ import { ChatList } from "@/components/chat/chat-list";
 import { setSelectedChatId, setSelectedUserId } from "@/redux/slice/admin";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft} from "lucide-react";
+import { useTheme } from "@/context/themeContext";
 
 const AdminPage = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -26,6 +27,7 @@ const AdminPage = () => {
     useSelector((state) => state.admin);
 
   const [tab, setTab] = useState<"chats" | "messages" | "users">("users");
+  const { theme, toggleTheme } = useTheme(); 
 
   useEffect(() => {
     dispatch(fetchUsers());
@@ -54,7 +56,7 @@ const AdminPage = () => {
 
   return (
     <div className="p-4 space-y-4 flex flex-col h-dvh">
-      <div className="flex items-center">
+      <div className="flex items-center justify-between">
         {tab !== "users" && (
           <Button
             variant="ghost"
@@ -62,10 +64,21 @@ const AdminPage = () => {
             className="md:hidden h-7"
             onClick={handleBack}
           >
-          <ChevronLeft className="h-4 w-4" />
+            <ChevronLeft className="h-4 w-4" />
           </Button>
         )}
         <h3 className="text-xl font-bold">Track User Activity</h3>
+        <Button
+          variant="outline"
+          className={`${
+            theme === "dark"
+              ? "bg-black text-white border-white hover:bg-black hover:text-white"
+              : "bg-white text-black border-black hover:bg-white hover:text-black"
+          }`}
+          onClick={toggleTheme}
+        >
+          {theme === "light" ? "Dark Mode" : "Light Mode"}
+        </Button>
       </div>
       <div className="grow flex gap-4">
         {/* Users Table */}

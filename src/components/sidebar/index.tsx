@@ -14,6 +14,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { logout } from "@/redux/slice/user";
 import { clearMessages } from "@/redux/slice/chatbot";
 import { deleteChat } from "@/action/api/chat"; 
+import { useTheme } from "@/context/themeContext";
 
 const Sidebar = () => {
   const dispatch = useDispatch();
@@ -22,10 +23,11 @@ const Sidebar = () => {
   const { isSidebarOpen } = useSelector((state) => state.app);
   const chats = useSelector((state) => state.chatbot.chats);
   const { isLoggedIn, user } = useSelector((state) => state.user);
-
   const [isRenaming, setIsRenaming] = useState(false);
   const [newTitle, setNewTitle] = useState("");
   const [selectedChatId, setSelectedChatId] = useState("");
+  
+   const { theme } = useTheme();
 
   const handleClose = () => {
     dispatch(toggleSidebar(false));
@@ -106,7 +108,9 @@ const Sidebar = () => {
                   className={({ isActive }) =>
                     cn(
                       "p-1 px-4 hover:bg-gray-200 cursor-pointer block w-full rounded-md mx-4",
-                      isActive && "bg-gray-200"
+                      isActive
+                        ? "bg-gray-200 dark:bg-gray-700"
+                        : "hover:bg-gray-200 dark:hover:bg-gray-800"
                     )
                   }
                 >
@@ -149,7 +153,11 @@ const Sidebar = () => {
                 type="text"
                 value={newTitle}
                 onChange={(e) => setNewTitle(e.target.value)}
-                className="border p-2 rounded w-full"
+                className={`border p-2 rounded w-full ${
+                  theme === "dark"
+                    ? "bg-black text-white placeholder-black"
+                    : "bg-white text-black placeholder-gray-500"
+                }`}
                 placeholder="New chat title"
               />
               <Button onClick={handleSaveRename} className="mt-2 w-full">
