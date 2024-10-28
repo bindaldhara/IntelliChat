@@ -86,7 +86,7 @@ export function ChatList({
   const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text);
     toast.success("Copied!", {
-      position: "top-right",
+      position: "top-center",
       autoClose: 1000,
       hideProgressBar: false,
       closeOnClick: true,
