@@ -172,6 +172,7 @@ export const submitFeedback = createAsyncThunk(
     { messageId, feedback }: { messageId: string; feedback: "up" | "down" },
   ) => {
     const res = await Axios.post("/feedback", { messageId, feedback });
+    console.log(res);
     return  { messageId, feedback }; 
   }
 );

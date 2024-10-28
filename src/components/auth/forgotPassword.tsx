@@ -94,8 +94,6 @@ const ForgotPasswordModal = ({ onClose }: ForgotPasswordModalProps) => {
               />
               <p className="text-red-500">{emailErrors.email?.message}</p>
             </div>
-
-            {/* Display error and success messages */}
             {error && <p className="text-red-500">{error}</p>}
             {forgotPasswordSuccess && (
               <p className="text-green-500">Password reset link sent!</p>
@@ -144,7 +142,6 @@ const ForgotPasswordModal = ({ onClose }: ForgotPasswordModalProps) => {
               <p className="text-red-500">{otpErrors.newPassword?.message}</p>
             </div>
             {error && <p className="text-red-500">{error}</p>}
-            {/* Display success messages */}
             {otpSuccess && (
               <p className="text-green-500">Password has been reset!</p>
             )}

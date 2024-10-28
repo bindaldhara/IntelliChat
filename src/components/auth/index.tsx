@@ -33,6 +33,7 @@ const AuthDialog = () => {
  const {title, description} = useMemo( ()=>{
   let title = "";
   let description = "";
+  
   if(page === "login"){
     title = "Login";
     description = "Login page";
