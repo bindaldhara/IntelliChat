@@ -84,7 +84,8 @@ export function ChatList({
 
   const { theme } = useTheme();
   const handleCopy = (text: string) => {
-    navigator.clipboard.writeText(text);
+    try{
+      navigator.clipboard.writeText(text);
     toast.success("Copied!", {
       position: "top-center",
       autoClose: 1000,
@@ -93,7 +94,19 @@ export function ChatList({
       pauseOnHover: true,
       theme: theme === "dark" ? "dark" : "light",
     });
-  };
+  } catch(err){
+    toast.error("Couldn't copy the text , running on HTTP", {
+      position: "top-center",
+      autoClose: 1000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      theme: theme === "dark" ? "dark" : "light",
+    });
+
+  }
+  }
+
 
   useEffect(() => {
     if (messagesContainerRef.current) {
